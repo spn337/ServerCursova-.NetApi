@@ -67,15 +67,31 @@ namespace WebServerCursova.Controllers
         {
             foreach (var profile in _context.UserProfiles)
             {
-                if(profile.DbUserId == user.Id)
+                if (profile.DbUserId == user.Id)
                 {
                     user.UserProfile = profile;
                     break;
                 }
             }
-          
+
             return user;
         }
+
+
+        /////////////////////////////////////////////////////////////////////////////////////////
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout([FromBody] string userEmail)
+        {
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+            await _signInManager.SignOutAsync();
+
+            return Ok();
+        }
+
 
         /////////////////////////////////////////////////////////////////////////////////////////
         [HttpPost("registration")]
