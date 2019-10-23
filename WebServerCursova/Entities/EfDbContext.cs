@@ -12,6 +12,8 @@ namespace WebServerCursova.Entities
             : base(options)
         { }
         public DbSet<UserProfile> UserProfiles { get; set; }
+        public DbSet<DbProduct> Products { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

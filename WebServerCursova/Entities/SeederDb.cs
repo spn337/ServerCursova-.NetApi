@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Linq;
 
 namespace WebServerCursova.Entities
 {
@@ -48,6 +49,44 @@ namespace WebServerCursova.Entities
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<DbRole>>();
 
                 SeedUsers(new LoginVM { Email = "bomba@gmail.com", Password = "Qwerty1-" }, userManager, roleManager);
+
+                SeedProduct(context, new DbProduct
+                {
+                    Name = "Пістони",
+                    Price = 4.75M,                   
+                });
+                SeedProduct(context, new DbProduct
+                {
+                    Name = "ДАРТС F701",
+                    Price = 30.48M,
+                });
+                SeedProduct(context, new DbProduct
+                {
+                    Name = "МЯЧ ФУТБОЛ. KEPAI MALADUONA ЛАКОВАНИЙ PU FH402",
+                    Price = 331.27M,
+                });
+                SeedProduct(context, new DbProduct
+                {
+                    Name = "РОЛИКИ HAPPY №1 L, ЧЕРНЫЙ",
+                    Price = 507.87M,
+                });
+            }
+        }
+
+        public static void SeedProduct (EFDbContext context, DbProduct model)
+        {
+            var product = context.Products.SingleOrDefault(p => p.Name == model.Name);
+            if(product == null)
+            {
+                product = new DbProduct
+                {
+                    Name = model.Name,
+                    Price = model.Price,
+                    DateCreate = DateTime.Now,
+                    PhotoName = model.PhotoName
+                };
+                context.Products.Add(product);
+                context.SaveChanges();
             }
         }
     }
