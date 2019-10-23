@@ -10,6 +10,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using WebServerCursova.Helpers;
 
 namespace WebServerCursova.Controllers
 {
@@ -53,6 +54,7 @@ namespace WebServerCursova.Controllers
             // і логінимо його
             await _signInManager.SignInAsync(user, isPersistent: false);
 
+            user = GetUserProfile(user);
             // видаємо юзеру токен авторизації
             return Ok(
                 new
@@ -61,33 +63,19 @@ namespace WebServerCursova.Controllers
                 });
         }
 
-        // метод, який буде видавати JWT-токен
-        private string CreateTokenJWT(DbUser user)
+        private DbUser GetUserProfile(DbUser user)
         {
-            // отримуємо всі ролі про юзера
-            var roles = _userManager.GetRolesAsync(user).Result;
-            var claims = new List<Claim>()
+            foreach (var profile in _context.UserProfiles)
             {
-                new Claim ("id", user.Id.ToString()),
-                new Claim ("Name", user.UserName)
-            };
-
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim("roles", role));
+                if(profile.DbUserId == user.Id)
+                {
+                    user.UserProfile = profile;
+                    break;
+                }
             }
-
-            // шифруємо токен 
-            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretePhrase));
-            var signingCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
-            var jwt = new JwtSecurityToken(
-                signingCredentials: signingCredentials,
-                claims: claims,
-                expires: DateTime.Now.AddHours(1));
-
-            return new JwtSecurityTokenHandler().WriteToken(jwt);
+          
+            return user;
         }
-
 
         /////////////////////////////////////////////////////////////////////////////////////////
         [HttpPost("registration")]
@@ -98,21 +86,8 @@ namespace WebServerCursova.Controllers
             // перевіряємо модель на валідність
             if (!ModelState.IsValid)
             {
-                var errors = ModelState.Select(x => x.Value.Errors)
-                           .Where(y => y.Count > 0)
-                           .ToList();
-
-                foreach (var item in errors)
-                {
-                    string message = "";
-
-                    foreach (var i in item)
-                    {
-                        message += i.ErrorMessage + " ";
-                    }
-
-                    err.Add(message);
-                }
+                var errors = CustomValidator.GetErrorsByModel(ModelState);
+                return BadRequest(errors);
             }
             else
             {
@@ -138,7 +113,7 @@ namespace WebServerCursova.Controllers
                     user = new DbUser
                     {
                         UserName = model.Email,
-                        Email = model.Email
+                        Email = model.Email,
                     };
 
                     var result = _userManager.CreateAsync(user, model.Password).Result;
@@ -149,7 +124,7 @@ namespace WebServerCursova.Controllers
                         // логінимо юзера
                         await _signInManager.SignInAsync(user, isPersistent: false);
 
-                        // передаємо модель в БД
+                        // передаємо модель в БД      
                         UserProfile up = new UserProfile
                         {
                             DbUserId = user.Id,
@@ -157,8 +132,12 @@ namespace WebServerCursova.Controllers
                             LastName = model.LastName,
                             Phone = model.Phone
                         };
+
+                        user.UserProfile = up;
+
                         _context.UserProfiles.Add(up);
                         _context.SaveChanges();
+
                         return Ok(
                        new
                        {
@@ -171,8 +150,42 @@ namespace WebServerCursova.Controllers
                     err.Add("Така пошта вже зареєстрована!");
                 }
             }
-
             return BadRequest(err);
+        }
+
+
+        // метод, який буде видавати JWT-токен
+        private string CreateTokenJWT(DbUser user)
+        {
+            var claims = new List<Claim>()
+            {
+                new Claim ("Id", user.Id.ToString()),
+                new Claim ("Email", user.Email),
+            };
+
+            if (user.UserProfile != null)
+            {
+                claims.Add(new Claim("FirstName", user.UserProfile.FirstName));
+                claims.Add(new Claim("LastName", user.UserProfile.LastName));
+                claims.Add(new Claim("Phone", user.UserProfile.Phone));
+            }
+
+            // отримуємо всі ролі про юзера
+            var roles = _userManager.GetRolesAsync(user).Result;
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim("Role", role));
+            }
+
+            // шифруємо токен 
+            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretePhrase));
+            var signingCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
+            var jwt = new JwtSecurityToken(
+                signingCredentials: signingCredentials,
+                claims: claims,
+                expires: DateTime.Now.AddHours(1));
+
+            return new JwtSecurityTokenHandler().WriteToken(jwt);
         }
     }
 }
