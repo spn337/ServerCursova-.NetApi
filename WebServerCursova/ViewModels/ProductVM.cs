@@ -7,6 +7,7 @@ namespace WebServerCursova.ViewModels
         public int Id { get; set; }
         public string Name { get; set; }
         public decimal Price { get; set; }
+        public string PhotoPath { get; set; }
     }
 
     public class ProductPostVM
@@ -16,6 +17,8 @@ namespace WebServerCursova.ViewModels
 
         [Required(ErrorMessage = "Поле не може бути порожнім")]
         public decimal Price { get; set; }
+        public string Photo { get; set; }
+        public string PhotoName { get; set; }
     }
 
     public class ProductDeleteVM

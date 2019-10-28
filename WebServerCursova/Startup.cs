@@ -9,6 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Http;
+using WebServerCursova.Helpers;
 
 namespace WebServerCursova
 {
@@ -27,6 +30,9 @@ namespace WebServerCursova
             services.AddDbContext<EFDbContext>(opt => opt
                 .UseSqlServer(Configuration
                     .GetConnectionString("DefaultConnection")));
+
+            ////////////////////////////////////////////////////////////////////
+            //////////// Прописуємо настройки токена
 
             //Прописуємо настройки Identity
             services.AddIdentity<DbUser, DbRole>(options => options.Stores.MaxLengthForKeys = 120)
@@ -83,9 +89,36 @@ namespace WebServerCursova
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
             app.UseMvc();
+            app.UseHttpsRedirection();
+            // дозвіл на авторизацію
             app.UseAuthentication();
+            // дозвіл серверу на роботу з файлами
+            app.UseStaticFiles();
+
+            ////////////////////////////////////////////////////////////////////
+            //////////// Прописуємо настройки роботи з фото
+
+            // шлях на сервері
+            //var rootPath = env.ContentRootPath; // шлях до кореневої папки
+            //string dirName = this.Configuration.GetValue<string>("ImagesPath");
+            //папка, де зберігатимуться фото
+            string dirPathSave = ImageHelper.CreateImageFolder(env, this.Configuration);
+            //// перевіряємо чи є така папка
+            //if (!Directory.Exists(dirPathSave))
+            //{
+            //    Directory.CreateDirectory(dirPathSave);
+            //}
+            // вказуємо серверу 
+            string imageUrl = "/images";
+
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                // вказуємо папку
+                FileProvider = new PhysicalFileProvider(dirPathSave),
+                // вказуємо url
+                RequestPath = new PathString(imageUrl)
+            });
 
             SeederDb.SeedData(app.ApplicationServices, env, this.Configuration);
         }

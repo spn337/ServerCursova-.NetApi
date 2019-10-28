@@ -53,7 +53,7 @@ namespace WebServerCursova.Entities
                 SeedProduct(context, new DbProduct
                 {
                     Name = "Пістони",
-                    Price = 4.75M,                   
+                    Price = 4.75M                  
                 });
                 SeedProduct(context, new DbProduct
                 {
@@ -68,7 +68,7 @@ namespace WebServerCursova.Entities
                 SeedProduct(context, new DbProduct
                 {
                     Name = "РОЛИКИ HAPPY №1 L, ЧЕРНЫЙ",
-                    Price = 507.87M,
+                    Price = 507.87M        
                 });
             }
         }
