@@ -36,11 +36,6 @@ namespace WebServerCursova.Controllers
         [HttpGet]
         public IActionResult GetProducts()
         {
-            // змінні для фото
-            //var rootPath = _env.ContentRootPath; // шлях до кореневої папки
-            //string dirName = _configuration.GetValue<string>("ImagesPath");  //папка, де зберігатимуться фото
-            //string dirPathSave = ImageHelper.CreateImageFolder(_env, _configuration);
-
             List<string> photoNames = Directory.GetFiles(dirPathSave)
                 .Select(f => Path.GetFileName(f))
                 .ToList();
@@ -70,18 +65,14 @@ namespace WebServerCursova.Controllers
         //[Authorize(Roles = "Admin")]
         public IActionResult Create([FromBody]ProductPostVM model)
         {
+            List<string> err = new List<string>();
+
+            // перевіряємо модель на валідність
             if (!ModelState.IsValid)
             {
-                return BadRequest();
+                var errors = CustomValidator.GetErrorsByModel(ModelState);
+                return BadRequest(errors);
             }
-            // змінні для фото
-            //var rootPath = _env.ContentRootPath; // шлях до кореневої папки
-            //string dirName = _configuration.GetValue<string>("ImagesPath");  //папка, де зберігатимуться фото
-            //string dirPathSave = ImageHelper.CreateImageFolder(_env, _configuration);
-            //if (!Directory.Exists(dirPathSave))
-            //{
-            //    Directory.CreateDirectory(dirPathSave);
-            //}
 
             // зберігаємо фото
             var bmp = model.Photo.FromBase64StringToImage();
@@ -90,8 +81,12 @@ namespace WebServerCursova.Controllers
                 model.PhotoName = Path.GetRandomFileName() + ".jpg";
 
                 string imageNamePath = Path.Combine(dirPathSave, model.PhotoName);
-                var image = ImageHelper.CreateImage(bmp, 300, 300);
+                var image = ImageHelper.CreateImage(bmp, 200, 200);
                 image.Save(imageNamePath, ImageFormat.Jpeg);
+            }
+            else
+            {
+                model.PhotoName = "Empty.jpg";
             }
 
             // передаємо модель в БД

@@ -53,22 +53,22 @@ namespace WebServerCursova.Entities
                 SeedProduct(context, new DbProduct
                 {
                     Name = "Пістони",
-                    Price = 4.75M                  
+                    Price = 4.75M
                 });
                 SeedProduct(context, new DbProduct
                 {
                     Name = "ДАРТС F701",
-                    Price = 30.48M,
+                    Price = 30.48M
                 });
                 SeedProduct(context, new DbProduct
                 {
                     Name = "МЯЧ ФУТБОЛ. KEPAI MALADUONA ЛАКОВАНИЙ PU FH402",
-                    Price = 331.27M,
+                    Price = 331.27M
                 });
                 SeedProduct(context, new DbProduct
                 {
                     Name = "РОЛИКИ HAPPY №1 L, ЧЕРНЫЙ",
-                    Price = 507.87M        
+                    Price = 507.87M
                 });
             }
         }

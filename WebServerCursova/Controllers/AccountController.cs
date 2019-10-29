@@ -105,67 +105,66 @@ namespace WebServerCursova.Controllers
                 var errors = CustomValidator.GetErrorsByModel(ModelState);
                 return BadRequest(errors);
             }
-            else
+
+            // створюємо роль адмін
+            string roleAdmin = "Admin";
+
+            // шукаємо роль в базі. Якщо немає - додаємо
+            var role = _roleManager.FindByNameAsync(roleAdmin).Result;
+            if (role == null)
             {
-                // створюємо роль адмін
-                string roleAdmin = "Admin";
-
-                // шукаємо роль в базі. Якщо немає - додаємо
-                var role = _roleManager.FindByNameAsync(roleAdmin).Result;
-                if (role == null)
+                role = new DbRole
                 {
-                    role = new DbRole
+                    Name = roleAdmin
+                };
+
+                var addRoleResult = _roleManager.CreateAsync(role).Result;
+            }
+
+            // шукаємо юзера в базі по імейлу. якщо немає - додаємо
+            var user = _userManager.FindByNameAsync(model.Email).Result;
+            if (user == null)
+            {
+                user = new DbUser
+                {
+                    UserName = model.Email,
+                    Email = model.Email,
+                };
+
+                var result = _userManager.CreateAsync(user, model.Password).Result;
+                // якщо додало - додаємо роль
+                if (result.Succeeded)
+                {
+                    result = _userManager.AddToRoleAsync(user, roleAdmin).Result;
+                    // логінимо юзера
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+
+                    // передаємо модель в БД      
+                    UserProfile up = new UserProfile
                     {
-                        Name = roleAdmin
+                        DbUserId = user.Id,
+                        FirstName = model.FirstName,
+                        LastName = model.LastName,
+                        Phone = model.Phone
                     };
 
-                    var addRoleResult = _roleManager.CreateAsync(role).Result;
-                }
+                    user.UserProfile = up;
 
-                // шукаємо юзера в базі по імейлу. якщо немає - додаємо
-                var user = _userManager.FindByNameAsync(model.Email).Result;
-                if (user == null)
-                {
-                    user = new DbUser
-                    {
-                        UserName = model.Email,
-                        Email = model.Email,
-                    };
+                    _context.UserProfiles.Add(up);
+                    _context.SaveChanges();
 
-                    var result = _userManager.CreateAsync(user, model.Password).Result;
-                    // якщо додало - додаємо роль
-                    if (result.Succeeded)
-                    {
-                        result = _userManager.AddToRoleAsync(user, roleAdmin).Result;
-                        // логінимо юзера
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-
-                        // передаємо модель в БД      
-                        UserProfile up = new UserProfile
-                        {
-                            DbUserId = user.Id,
-                            FirstName = model.FirstName,
-                            LastName = model.LastName,
-                            Phone = model.Phone
-                        };
-
-                        user.UserProfile = up;
-
-                        _context.UserProfiles.Add(up);
-                        _context.SaveChanges();
-
-                        return Ok(
-                       new
-                       {
-                           token = CreateTokenJWT(user)
-                       });
-                    }
-                }
-                else
-                {
-                    err.Add("Така пошта вже зареєстрована!");
+                    return Ok(
+                   new
+                   {
+                       token = CreateTokenJWT(user)
+                   });
                 }
             }
+            else
+            {
+                err.Add("Така пошта вже зареєстрована!");
+            }
+
             return BadRequest(err);
         }
 
