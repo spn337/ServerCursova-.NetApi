@@ -24,6 +24,9 @@ namespace WebServerCursova.Controllers
 
         private readonly string dirPathSave;
 
+        private readonly string kNamePhotoDefault = "Empty.jpg";
+
+
         public ProductController(IHostingEnvironment env, IConfiguration configuration, EFDbContext context)
         {
             _configuration = configuration;
@@ -32,32 +35,22 @@ namespace WebServerCursova.Controllers
             dirPathSave = ImageHelper.CreateImageFolder(_env, _configuration);
         }
 
+
         #region HttpGET
         [HttpGet]
         public IActionResult GetProducts()
         {
-            List<string> photoNames = Directory.GetFiles(dirPathSave)
-                .Select(f => Path.GetFileName(f))
-                .ToList();
-
             var model = _context.Products.Select(
                 p => new ProductGetVM
                 {
                     Id = p.Id,
                     Name = p.Name,
                     Price = p.Price,
-                    PhotoPath = GetPhotoPath(dirPathSave, photoNames, p.PhotoName),
+                    PhotoName = p.PhotoName
                 }).ToList();
 
             return Ok(model);
-        }
-
-        private string GetPhotoPath(string dirPath, List<string> fileNames, string photoName)
-        {
-            var searchName = fileNames
-                .Find(n => n == photoName);
-            return (searchName != null) ? Path.Combine(dirPath, searchName) : null;
-        }
+        }       
         #endregion
 
         #region HttpPOST
@@ -86,7 +79,7 @@ namespace WebServerCursova.Controllers
             }
             else
             {
-                model.PhotoName = "Empty.jpg";
+                model.PhotoName = kNamePhotoDefault;
             }
 
             // передаємо модель в БД
@@ -112,13 +105,22 @@ namespace WebServerCursova.Controllers
             {
                 return BadRequest();
             }
-            var prod = _context.Products.SingleOrDefault(p => p.Id == model.Id);
-            if (prod != null)
+
+            var fullProduct = _context.Products.SingleOrDefault(p => p.Id == model.Id);
+            if (fullProduct != null)
             {
-                _context.Products.Remove(prod);
+                //видаляємо фото(якщо не за замовчуванням)
+                if (fullProduct.PhotoName != kNamePhotoDefault)
+                {
+                    string imageNamePath = Path.Combine(dirPathSave, fullProduct.PhotoName);
+                    System.IO.File.Delete(imageNamePath);
+                }
+                //видаляємо продукт
+                _context.Products.Remove(fullProduct);
                 _context.SaveChanges();
             }
-            return Ok(prod.Id);
+
+            return Ok(fullProduct.Id);
         }
         #endregion
     }

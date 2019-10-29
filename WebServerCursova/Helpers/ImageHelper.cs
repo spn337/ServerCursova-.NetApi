@@ -11,9 +11,10 @@ namespace WebServerCursova.Helpers
     {
         public static Bitmap FromBase64StringToImage(this string base64String)
         {
-            byte[] byteBuffer = Convert.FromBase64String(base64String);
             try
             {
+                byte[] byteBuffer = Convert.FromBase64String(base64String);
+
                 using (MemoryStream memoryStream = new MemoryStream(byteBuffer))
                 {
                     memoryStream.Position = 0;

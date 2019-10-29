@@ -99,17 +99,9 @@ namespace WebServerCursova
             ////////////////////////////////////////////////////////////////////
             //////////// Прописуємо настройки роботи з фото
 
-            // шлях на сервері
-            //var rootPath = env.ContentRootPath; // шлях до кореневої папки
-            //string dirName = this.Configuration.GetValue<string>("ImagesPath");
-            //папка, де зберігатимуться фото
             string dirPathSave = ImageHelper.CreateImageFolder(env, this.Configuration);
-            //// перевіряємо чи є така папка
-            //if (!Directory.Exists(dirPathSave))
-            //{
-            //    Directory.CreateDirectory(dirPathSave);
-            //}
-            // вказуємо серверу 
+
+            // вказуємо серверу як називатиметься папка з фото
             string imageUrl = "/images";
 
             app.UseStaticFiles(new StaticFileOptions()
