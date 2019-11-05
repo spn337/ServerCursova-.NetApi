@@ -17,8 +17,8 @@ namespace WebServerCursova.ViewModels
 
         [Required(ErrorMessage = "Поле не може бути порожнім")]
         public decimal Price { get; set; }
-        public string Photo { get; set; }
-        public string PhotoName { get; set; }
+        public string PhotoBase64 { get; set; }  // вхідний параметр
+        public string PhotoName { get; set; }    // вихідний параметр
     }
 
     public class ProductDeleteVM
@@ -36,5 +36,7 @@ namespace WebServerCursova.ViewModels
 
         [Required(ErrorMessage = "Поле не може бути порожнім")]
         public decimal Price { get; set; }
+        public string PhotoBase64 { get; set; }  // вхідний параметр
+        public string PhotoName { get; set; }    // вихідний параметр
     }
 }

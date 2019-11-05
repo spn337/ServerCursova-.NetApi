@@ -99,7 +99,7 @@ namespace WebServerCursova
             ////////////////////////////////////////////////////////////////////
             //////////// Прописуємо настройки роботи з фото
 
-            string dirPathSave = ImageHelper.CreateImageFolder(env, this.Configuration);
+            string dirPathSave = ImageHelper.GetImageFolder(env, this.Configuration);
 
             // вказуємо серверу як називатиметься папка з фото
             string imageUrl = "/images";

@@ -81,7 +81,7 @@ namespace WebServerCursova.Helpers
                 return null;
             }
         }
-        public static string CreateImageFolder(IHostingEnvironment env, IConfiguration configuration)
+        public static string GetImageFolder(IHostingEnvironment env, IConfiguration configuration)
         {
             var rootPath = env.ContentRootPath; // шлях до кореневої папки
             string dirName = configuration.GetValue<string>("ImagesPath");  //папка, де зберігатимуться фото

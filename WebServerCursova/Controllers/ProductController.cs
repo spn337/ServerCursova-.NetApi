@@ -32,11 +32,31 @@ namespace WebServerCursova.Controllers
             _configuration = configuration;
             _env = env;
             _context = context;
-            dirPathSave = ImageHelper.CreateImageFolder(_env, _configuration);
+            dirPathSave = ImageHelper.GetImageFolder(_env, _configuration);
         }
 
+        #region HttpGetId
+        [HttpGet("{id}")]
+        public IActionResult GetProductById(int id)
+        {
+            var model = _context.Products
+                .Select(p => new ProductPutVM
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Price = p.Price,
+                    PhotoName = p.PhotoName
+                })
+                .SingleOrDefault(p => p.Id == id);
+            if (model == null)
+            {
+                return NotFound(new { invalid = "Not fount by id" });
+            }
+            return Ok(model);
+        }
+        #endregion
 
-        #region HttpGET
+        #region HttpGet
         [HttpGet]
         public IActionResult GetProducts()
         {
@@ -50,10 +70,10 @@ namespace WebServerCursova.Controllers
                 }).ToList();
 
             return Ok(model);
-        }       
+        }
         #endregion
 
-        #region HttpPOST
+        #region HttpPost
         [HttpPost]
         //[Authorize(Roles = "Admin")]
         public IActionResult Create([FromBody]ProductPostVM model)
@@ -68,7 +88,7 @@ namespace WebServerCursova.Controllers
             }
 
             // зберігаємо фото
-            var bmp = model.Photo.FromBase64StringToImage();
+            var bmp = model.PhotoBase64.FromBase64StringToImage();
             if (bmp != null)
             {
                 model.PhotoName = Path.GetRandomFileName() + ".jpg";
@@ -83,21 +103,21 @@ namespace WebServerCursova.Controllers
             }
 
             // передаємо модель в БД
-            DbProduct p = new DbProduct
+            DbProduct prod = new DbProduct
             {
                 Name = model.Name,
                 Price = model.Price,
                 DateCreate = DateTime.Now,
                 PhotoName = model.PhotoName
             };
-            _context.Products.Add(p);
+            _context.Products.Add(prod);
             _context.SaveChanges();
 
-            return Ok(p.Id);
+            return Ok(prod.Id);
         }
         #endregion
 
-        #region HttpDELETE
+        #region HttpDelete
         [HttpDelete]
         public IActionResult Delete([FromBody]ProductDeleteVM model)
         {
@@ -110,7 +130,7 @@ namespace WebServerCursova.Controllers
             if (fullProduct != null)
             {
                 //видаляємо фото(якщо не за замовчуванням)
-                if (fullProduct.PhotoName != kNamePhotoDefault)
+                if (fullProduct.PhotoName != kNamePhotoDefault && fullProduct.PhotoName != null)
                 {
                     string imageNamePath = Path.Combine(dirPathSave, fullProduct.PhotoName);
                     System.IO.File.Delete(imageNamePath);
@@ -121,6 +141,52 @@ namespace WebServerCursova.Controllers
             }
 
             return Ok(fullProduct.Id);
+        }
+        #endregion
+
+        #region HttpPut
+        [HttpPut]
+        public IActionResult EditSave([FromBody]ProductPutVM newModel)
+        {
+            List<string> err = new List<string>();
+
+            // перевіряємо нову модель на валідність
+            if (!ModelState.IsValid)
+            {
+                var errors = CustomValidator.GetErrorsByModel(ModelState);
+                return BadRequest(errors);
+            }
+
+            //// дістаємо стару модель
+            var product = _context.Products
+                .SingleOrDefault(p => p.Id == newModel.Id);
+
+            if (product != null)
+            {      
+                // якщо вибрали нове фото
+                if (newModel.PhotoBase64 != "")
+                {
+                    product.PhotoName = Path.GetRandomFileName() + ".jpg";
+
+                    var bmp = newModel.PhotoBase64.FromBase64StringToImage();
+
+                    var imageNamePath = Path.Combine(dirPathSave, product.PhotoName);
+                    var image = ImageHelper.CreateImage(bmp, 200, 200);
+                    image.Save(imageNamePath, ImageFormat.Jpeg);
+                }
+
+                product.Name = newModel.Name;
+                product.Price = newModel.Price;
+                product.DateCreate = DateTime.Now;
+
+                _context.SaveChanges();
+            }
+            else
+            {
+                return NotFound();
+            }
+
+            return Ok(newModel.Id);
         }
         #endregion
     }
