@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace WebServerCursova.Entities
 {
@@ -50,33 +51,127 @@ namespace WebServerCursova.Entities
 
                 SeedUsers(new LoginVM { Email = "bomba@gmail.com", Password = "Qwerty1-" }, userManager, roleManager);
 
+                #region tblProducts - Товари
                 SeedProduct(context, new DbProduct
                 {
-                    Name = "Пістони",
-                    Price = 4.75M
+                    Name = "ИГРОВОЙ НАБОР BEYBLADE 2 ЗАПУСКАЛКИ И АРЕНА",
+                    Price = 223.16M,
+                    PhotoName = "ИГРОВОЙ НАБОР BEYBLADE 2 ЗАПУСКАЛКИ И АРЕНА.jpg"
                 });
                 SeedProduct(context, new DbProduct
                 {
-                    Name = "ДАРТС F701",
-                    Price = 30.48M
+                    Name = "КОНСТРУКТОР BRICK 1904 70ШТ POLICE 95ДЕТ., В СОБР.КОР.2214,54,5СМ",
+                    Price = 48.65M,
+                    PhotoName = "КОНСТРУКТОР BRICK 1904 70ШТ POLICE 95ДЕТ., В СОБР.КОР.2214,54,5СМ.jpg"
                 });
                 SeedProduct(context, new DbProduct
                 {
-                    Name = "МЯЧ ФУТБОЛ. KEPAI MALADUONA ЛАКОВАНИЙ PU FH402",
-                    Price = 331.27M
+                    Name = "КОНСТРУКТОР BRICK 1905 48ШТ POLICE 157ДЕТ.,В РАЗОБР.КОР.30517,5СМ",
+                    Price = 81.36M,
+                    PhotoName = "КОНСТРУКТОР BRICK 1905 48ШТ POLICE 157ДЕТ.,В РАЗОБР.КОР.30517,5СМ.jpg"
                 });
                 SeedProduct(context, new DbProduct
                 {
-                    Name = "РОЛИКИ HAPPY №1 L, ЧЕРНЫЙ",
-                    Price = 507.87M
+                    Name = "МОТОЦИКЛ M1905 СИН 1ШТ АККУМ.6V-4.5AH, В КОР.662533СМ",
+                    Price = 1407.96M,
+                    PhotoName = "МОТОЦИКЛ M1905 СИН 1ШТ АККУМ.6V-4.5AH, В КОР.662533СМ.jpg"
                 });
-            }
+
+                #endregion
+
+                #region tblFilterNames - Назви фільтрів
+
+                string[] filterNames = { "Ціна", "Вид" };
+                foreach (var itemName in filterNames)
+                {
+                    var filterName = context.FilterNames.SingleOrDefault(f => f.Name == itemName);
+                    if (filterName == null)
+                    {
+                        context.FilterNames.Add(new FilterName { Name = itemName });
+                        context.SaveChanges();
+                    }
+                }
+
+                #endregion
+
+                #region tblFilterValues - Значення фільтрів
+
+                List<string[]> filterValues = new List<string[]> {
+                    new string[] {"Менше 50 грн", "50-100грн", "100-300грн", "300-700грн", "більше 700грн" },
+                    new string[] {"Запускалки", "Конструктори", "Транспорт", "Спорт", "Дерев'яні іграшки", "Пластик",  "Інші"}
+                };
+
+                foreach (var itemValues in filterValues)
+                {
+                    foreach (var itemValue in itemValues)
+                    {
+                        var filterValue = context.FilterValues.SingleOrDefault(f => f.Name == itemValue);
+                        if (filterValue == null)
+                        {
+                            context.FilterValues.Add(new FilterValue { Name = itemValue });
+                            context.SaveChanges();
+                        }
+                    }
+                }
+                #endregion
+
+                #region tblFilterNameGroups - Групування по групах фільтрів
+
+                for (int i = 0; i < filterNames.Length; i++)
+                {
+                    foreach (var value in filterValues[i])
+                    {
+                        var nId = context.FilterNames.SingleOrDefault(f => f.Name == filterNames[i]).Id;
+                        var vId = context.FilterValues.SingleOrDefault(f => f.Name == value).Id;
+
+                        var group = context.FilterNameGroups.SingleOrDefault(f => f.FilterValueId == vId && f.FilterNameId == nId);
+                        if (group == null)
+                        {
+                            context.FilterNameGroups.Add(new FilterNameGroup
+                            {
+                                FilterNameId = nId,
+                                FilterValueId = vId
+                            });
+                            context.SaveChanges();
+                        }
+                    }
+                }
+
+                #endregion
+
+                #region tblFilters - Фільтри
+                Filter[] filters =
+                {
+                        new Filter { FilterNameId = 1, FilterValueId = 3, ProductId = 52 },
+                        new Filter { FilterNameId = 2, FilterValueId = 6, ProductId = 52 },
+
+                        new Filter { FilterNameId = 1, FilterValueId = 2, ProductId = 53 },
+                        new Filter { FilterNameId = 2, FilterValueId = 7, ProductId = 53 },
+
+                        new Filter { FilterNameId = 1, FilterValueId = 2, ProductId = 54 },
+                        new Filter { FilterNameId = 2, FilterValueId = 7, ProductId = 54 },
+
+                        new Filter { FilterNameId = 1, FilterValueId = 5, ProductId = 55 },
+                        new Filter { FilterNameId = 2, FilterValueId = 8, ProductId = 55 }
+                };
+
+                foreach (var item in filters)
+                {
+                    var f = context.Filters.SingleOrDefault(p => p == item);
+                    if (f == null)
+                    {
+                        context.Filters.Add(new Filter { FilterNameId = item.FilterNameId, FilterValueId = item.FilterValueId, ProductId = item.ProductId });
+                        context.SaveChanges();
+                    }
+                }
+                #endregion
+            };
         }
 
-        public static void SeedProduct (EFDbContext context, DbProduct model)
+        public static void SeedProduct(EFDbContext context, DbProduct model)
         {
             var product = context.Products.SingleOrDefault(p => p.Name == model.Name);
-            if(product == null)
+            if (product == null)
             {
                 product = new DbProduct
                 {
@@ -91,3 +186,4 @@ namespace WebServerCursova.Entities
         }
     }
 }
+

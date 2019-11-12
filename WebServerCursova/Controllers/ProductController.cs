@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using WebServerCursova.Entities;
 using WebServerCursova.Helpers;
+using WebServerCursova.Services;
 using WebServerCursova.ViewModels;
 
 namespace WebServerCursova.Controllers
@@ -73,6 +74,59 @@ namespace WebServerCursova.Controllers
         }
         #endregion
 
+        #region HttpGetByFilter
+        [HttpGet("GetByFilter")]
+        public IActionResult FilterData(List<int> value)
+        {
+            var filters = FiltersService.GetFilterList(_context);
+            var productsByFilter = GetProductsByFilter(value, filters);
+            return Ok(productsByFilter);
+        }
+       
+        private List<ProductGetVM> GetProductsByFilter(List<int> values, List<FilterVM> filterList)
+        {
+            var query = _context.Products.AsQueryable();
+            //проходимо цикл по назвам фільтра
+            foreach (var fName in filterList)
+            {
+                int count = 0; //кількість співпадінь в даній групі фільтрів
+                var predicate = PredicateBuilder.False<DbProduct>();
+                //проходимо цикл по значенням назв фільтрів
+                foreach (var fValue in fName.Children)
+                {
+                    for (int i = 0; i < values.Count; i++)
+                    {
+
+                        var idValue = fValue.Id;
+                        //перевірка на співпадіння(додаємо до запита "OR" якщо є співпадіння в однакових групах)
+                        if (idValue == values[i])
+                        {
+                            predicate = predicate
+                                .Or(p => p.Filters
+                                    .Any(f => f.FilterValueId == idValue));
+                            count++;
+                        }
+                    }
+                }
+                //додаємо до запита "AND" якщо є співпадіння в різних групах
+                if (count > 0)
+                {
+                    query = query.Where(predicate);
+                }
+            }
+            //формуємо новий список(відфільтрований)
+            var result = query.Select(p => new ProductGetVM
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.Price,
+                PhotoName = p.PhotoName
+            }).ToList();
+
+            return result;
+        }
+        #endregion
+
         #region HttpPost
         [HttpPost]
         //[Authorize(Roles = "Admin")]
@@ -94,7 +148,7 @@ namespace WebServerCursova.Controllers
                 model.PhotoName = Path.GetRandomFileName() + ".jpg";
 
                 string imageNamePath = Path.Combine(dirPathSave, model.PhotoName);
-                var image = ImageHelper.CreateImage(bmp, 200, 200);
+                var image = ImageHelper.CreateImage(bmp, 300, 300);
                 image.Save(imageNamePath, ImageFormat.Jpeg);
             }
             else
@@ -162,7 +216,7 @@ namespace WebServerCursova.Controllers
                 .SingleOrDefault(p => p.Id == newModel.Id);
 
             if (product != null)
-            {      
+            {
                 // якщо вибрали нове фото
                 if (newModel.PhotoBase64 != "")
                 {
