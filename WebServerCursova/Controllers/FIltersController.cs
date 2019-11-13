@@ -16,10 +16,6 @@ namespace WebServerCursova.Controllers
         //отримати доступ до сервера
         private readonly IHostingEnvironment _env;
 
-        private readonly string dirPathSave;
-
-        private readonly string kNamePhotoDefault = "Empty.jpg";
-
         public FiltersController(IHostingEnvironment env, IConfiguration configuration, EFDbContext context)
         {
             _configuration = configuration;

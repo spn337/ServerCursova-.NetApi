@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebServerCursova.ViewModels
 {
@@ -19,6 +20,7 @@ namespace WebServerCursova.ViewModels
         public decimal Price { get; set; }
         public string PhotoBase64 { get; set; }  // вхідний параметр
         public string PhotoName { get; set; }    // вихідний параметр
+        public int FilterIdType { get; set; }
     }
 
     public class ProductDeleteVM

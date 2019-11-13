@@ -82,7 +82,7 @@ namespace WebServerCursova.Controllers
             var productsByFilter = GetProductsByFilter(value, filters);
             return Ok(productsByFilter);
         }
-       
+
         private List<ProductGetVM> GetProductsByFilter(List<int> values, List<FilterVM> filterList)
         {
             var query = _context.Products.AsQueryable();
@@ -164,8 +164,23 @@ namespace WebServerCursova.Controllers
                 DateCreate = DateTime.Now,
                 PhotoName = model.PhotoName
             };
+
             _context.Products.Add(prod);
             _context.SaveChanges();
+
+
+            int fValueIdType = model.FilterIdType;
+            int fNameIdType = _context.FilterNameGroups
+                .SingleOrDefault(v=>v.FilterValueId==model.FilterIdType).FilterNameId;
+
+
+            Filter filter = new Filter { FilterNameId = fNameIdType, FilterValueId = fValueIdType, ProductId = prod.Id };
+            var f = _context.Filters.SingleOrDefault(p => p == filter);
+            if (f == null)
+            {
+                _context.Filters.Add(filter);
+                _context.SaveChanges();
+            }
 
             return Ok(prod.Id);
         }
