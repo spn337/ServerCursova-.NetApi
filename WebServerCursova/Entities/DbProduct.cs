@@ -16,5 +16,9 @@ namespace WebServerCursova.Entities
         public DateTime DateCreate { get; set; }
         public string PhotoName { get; set; }
         public virtual ICollection<Filter> Filters { get; set; }
+
+        [ForeignKey("Category")]
+        public int? CategoryId { get; set; }
+        public virtual Category Category { get; set; }
     }
 }

@@ -61,8 +61,8 @@ namespace WebServerCursova.Controllers
         [HttpGet]
         public IActionResult GetProducts()
         {
-            var model = _context.Products.Select(
-                p => new ProductGetVM
+            var model = _context.Products
+                .Select(p => new ProductGetVM
                 {
                     Id = p.Id,
                     Name = p.Name,
@@ -73,7 +73,23 @@ namespace WebServerCursova.Controllers
             return Ok(model);
         }
         #endregion
+        #region HttpGetByCategory
+        [HttpGet("GetByCategory")]
+        public IActionResult GetProductsByCategory(int value)
+        {
+            var model = _context.Products.Where(t => t.CategoryId == value)
+            .Select(p => new ProductGetVM
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.Price,
+                PhotoName = p.PhotoName
+            }).ToList();
 
+            return Ok(model);
+        }
+
+        #endregion
         #region HttpGetByFilter
         [HttpGet("GetByFilter")]
         public IActionResult FilterData(List<int> value)
@@ -171,7 +187,7 @@ namespace WebServerCursova.Controllers
 
             int fValueIdType = model.FilterIdType;
             int fNameIdType = _context.FilterNameGroups
-                .SingleOrDefault(v=>v.FilterValueId==model.FilterIdType).FilterNameId;
+                .SingleOrDefault(v => v.FilterValueId == model.FilterIdType).FilterNameId;
 
 
             Filter filter = new Filter { FilterNameId = fNameIdType, FilterValueId = fValueIdType, ProductId = prod.Id };

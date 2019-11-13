@@ -56,25 +56,29 @@ namespace WebServerCursova.Entities
                 {
                     Name = "ИГРОВОЙ НАБОР BEYBLADE 2 ЗАПУСКАЛКИ И АРЕНА",
                     Price = 223.16M,
-                    PhotoName = "ИГРОВОЙ НАБОР BEYBLADE 2 ЗАПУСКАЛКИ И АРЕНА.jpg"
+                    PhotoName = "ИГРОВОЙ НАБОР BEYBLADE 2 ЗАПУСКАЛКИ И АРЕНА.jpg",
+                    CategoryId = 1
                 });
                 SeedProduct(context, new DbProduct
                 {
                     Name = "КОНСТРУКТОР BRICK 1904 70ШТ POLICE 95ДЕТ., В СОБР.КОР.2214,54,5СМ",
                     Price = 48.65M,
-                    PhotoName = "КОНСТРУКТОР BRICK 1904 70ШТ POLICE 95ДЕТ., В СОБР.КОР.2214,54,5СМ.jpg"
+                    PhotoName = "КОНСТРУКТОР BRICK 1904 70ШТ POLICE 95ДЕТ., В СОБР.КОР.2214,54,5СМ.jpg",
+                    CategoryId = 2
                 });
                 SeedProduct(context, new DbProduct
                 {
                     Name = "КОНСТРУКТОР BRICK 1905 48ШТ POLICE 157ДЕТ.,В РАЗОБР.КОР.30517,5СМ",
                     Price = 81.36M,
-                    PhotoName = "КОНСТРУКТОР BRICK 1905 48ШТ POLICE 157ДЕТ.,В РАЗОБР.КОР.30517,5СМ.jpg"
+                    PhotoName = "КОНСТРУКТОР BRICK 1905 48ШТ POLICE 157ДЕТ.,В РАЗОБР.КОР.30517,5СМ.jpg",
+                    CategoryId = 2
                 });
                 SeedProduct(context, new DbProduct
                 {
                     Name = "МОТОЦИКЛ M1905 СИН 1ШТ АККУМ.6V-4.5AH, В КОР.662533СМ",
                     Price = 1407.96M,
-                    PhotoName = "МОТОЦИКЛ M1905 СИН 1ШТ АККУМ.6V-4.5AH, В КОР.662533СМ.jpg"
+                    PhotoName = "МОТОЦИКЛ M1905 СИН 1ШТ АККУМ.6V-4.5AH, В КОР.662533СМ.jpg",
+                    CategoryId = 6
                 });
 
                 #endregion
