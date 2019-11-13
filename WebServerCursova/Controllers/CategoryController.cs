@@ -8,7 +8,7 @@ namespace WebServerCursova.Controllers
 {
     [Produces("application/json")]
     [Route("api/[controller]")]
-    public class FiltersController : ControllerBase
+    public class CategoryController : ControllerBase
     {
         private readonly EFDbContext _context;
         //доступ до файла app.setting
@@ -16,7 +16,7 @@ namespace WebServerCursova.Controllers
         //отримати доступ до сервера
         private readonly IHostingEnvironment _env;
 
-        public FiltersController(IHostingEnvironment env, IConfiguration configuration, EFDbContext context)
+        public CategoryController(IHostingEnvironment env, IConfiguration configuration, EFDbContext context)
         {
             _configuration = configuration;
             _env = env;
@@ -27,7 +27,7 @@ namespace WebServerCursova.Controllers
         [HttpGet]
         public IActionResult GetFilters()
         {
-            var model = FiltersService.GetFilterList(_context);
+            var model = CategoriesService.GetCategoryList(_context);
             return Ok(model);
         }
         #endregion

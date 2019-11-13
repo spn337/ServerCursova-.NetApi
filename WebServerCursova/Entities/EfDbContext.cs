@@ -18,6 +18,9 @@ namespace WebServerCursova.Entities
         public DbSet<FilterNameGroup> FilterNameGroups { get; set; }
         public DbSet<Filter> Filters { get; set; }
 
+        //Categories
+        public DbSet<Category> Categories { get; set; }
+
         public EFDbContext(DbContextOptions<EFDbContext> options)
          : base(options)
         { }

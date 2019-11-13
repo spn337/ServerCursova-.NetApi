@@ -165,7 +165,80 @@ namespace WebServerCursova.Entities
                     }
                 }
                 #endregion
-            };
+
+                #region tblCategories - Категорії
+
+                SeedCategory(context, new Category
+                {
+                    Name = "Запускалки",
+                    ParentId = null
+                });
+
+                SeedCategory(context, new Category
+                {
+                    Name = "Конструктори",
+                    ParentId = null
+                });
+
+                SeedCategory(context, new Category
+                {
+                    Name = "Транспорт",
+                    ParentId = null
+                });
+                SeedCategory(context, new Category
+                {
+                    Name = "Літній",
+                    ParentId = 3
+                });
+                SeedCategory(context, new Category
+                {
+                    Name = "Зимовий",
+                    ParentId = 3
+                });
+                SeedCategory(context, new Category
+                {
+                    Name = "Велосипеди",
+                    ParentId = 4
+                });
+                SeedCategory(context, new Category
+                {
+                    Name = "Ролики",
+                    ParentId = 4
+                });
+                SeedCategory(context, new Category
+                {
+                    Name = "Ковзани",
+                    ParentId = 5
+                });
+                SeedCategory(context, new Category
+                {
+                    Name = "Снігокати",
+                    ParentId = 5
+                });
+
+                SeedCategory(context, new Category
+                {
+                    Name = "Спорттовари",
+                    ParentId = null
+                });
+                SeedCategory(context, new Category
+                {
+                    Name = "М'ячі",
+                    ParentId = 10
+                });
+                SeedCategory(context, new Category
+                {
+                    Name = "Боксерські набори",
+                    ParentId = 10
+                });
+
+                SeedCategory(context, new Category
+                {
+                    Name = "Зброя",
+                    ParentId = null
+                });
+                #endregion
+            }
         }
 
         public static void SeedProduct(EFDbContext context, DbProduct model)
@@ -181,6 +254,20 @@ namespace WebServerCursova.Entities
                     PhotoName = model.PhotoName
                 };
                 context.Products.Add(product);
+                context.SaveChanges();
+            }
+        }
+        public static void SeedCategory(EFDbContext context, Category model)
+        {
+            var category = context.Categories.SingleOrDefault(p => p.Name == model.Name);
+            if (category == null)
+            {
+                category = new Category
+                {
+                    Name = model.Name,
+                    ParentId = model.ParentId
+                };
+                context.Categories.Add(category);
                 context.SaveChanges();
             }
         }
