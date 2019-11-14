@@ -58,21 +58,7 @@ namespace WebServerCursova.Entities
                     Price = 223.16M,
                     PhotoName = "ИГРОВОЙ НАБОР BEYBLADE 2 ЗАПУСКАЛКИ И АРЕНА.jpg",
                     CategoryId = 1
-                });
-                SeedProduct(context, new DbProduct
-                {
-                    Name = "КОНСТРУКТОР BRICK 1904 70ШТ POLICE 95ДЕТ., В СОБР.КОР.2214,54,5СМ",
-                    Price = 48.65M,
-                    PhotoName = "КОНСТРУКТОР BRICK 1904 70ШТ POLICE 95ДЕТ., В СОБР.КОР.2214,54,5СМ.jpg",
-                    CategoryId = 2
-                });
-                SeedProduct(context, new DbProduct
-                {
-                    Name = "КОНСТРУКТОР BRICK 1905 48ШТ POLICE 157ДЕТ.,В РАЗОБР.КОР.30517,5СМ",
-                    Price = 81.36M,
-                    PhotoName = "КОНСТРУКТОР BRICK 1905 48ШТ POLICE 157ДЕТ.,В РАЗОБР.КОР.30517,5СМ.jpg",
-                    CategoryId = 2
-                });
+                });                
                 SeedProduct(context, new DbProduct
                 {
                     Name = "МОТОЦИКЛ M1905 СИН 1ШТ АККУМ.6V-4.5AH, В КОР.662533СМ",
@@ -102,7 +88,7 @@ namespace WebServerCursova.Entities
 
                 List<string[]> filterValues = new List<string[]> {
                     new string[] {"Менше 50 грн", "50-100грн", "100-300грн", "300-700грн", "більше 700грн" },
-                    new string[] {"Запускалки", "Конструктори", "Транспорт", "Спорт", "Дерев'яні іграшки", "Пластик",  "Інші"}
+                    new string[] {"Активний відпочинок", "Гра на місці"}
                 };
 
                 foreach (var itemValues in filterValues)
@@ -146,17 +132,12 @@ namespace WebServerCursova.Entities
                 #region tblFilters - Фільтри
                 Filter[] filters =
                 {
-                        new Filter { FilterNameId = 1, FilterValueId = 3, ProductId = 52 },
-                        new Filter { FilterNameId = 2, FilterValueId = 6, ProductId = 52 },
+                        new Filter { FilterNameId = 1, FilterValueId = 3, ProductId = 64 },
+                        new Filter { FilterNameId = 3, FilterValueId = 14, ProductId = 64 },
+   
 
-                        new Filter { FilterNameId = 1, FilterValueId = 2, ProductId = 53 },
-                        new Filter { FilterNameId = 2, FilterValueId = 7, ProductId = 53 },
-
-                        new Filter { FilterNameId = 1, FilterValueId = 2, ProductId = 54 },
-                        new Filter { FilterNameId = 2, FilterValueId = 7, ProductId = 54 },
-
-                        new Filter { FilterNameId = 1, FilterValueId = 5, ProductId = 55 },
-                        new Filter { FilterNameId = 2, FilterValueId = 8, ProductId = 55 }
+                        new Filter { FilterNameId = 1, FilterValueId = 5, ProductId = 67 },
+                        new Filter { FilterNameId = 3, FilterValueId = 13, ProductId = 67 }
                 };
 
                 foreach (var item in filters)

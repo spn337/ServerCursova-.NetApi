@@ -73,6 +73,7 @@ namespace WebServerCursova.Controllers
             return Ok(model);
         }
         #endregion
+
         #region HttpGetByCategory
         [HttpGet("GetByCategory")]
         public IActionResult GetProductsByCategory(int value)
@@ -90,6 +91,7 @@ namespace WebServerCursova.Controllers
         }
 
         #endregion
+
         #region HttpGetByFilter
         [HttpGet("GetByFilter")]
         public IActionResult FilterData(List<int> value)
@@ -178,7 +180,8 @@ namespace WebServerCursova.Controllers
                 Name = model.Name,
                 Price = model.Price,
                 DateCreate = DateTime.Now,
-                PhotoName = model.PhotoName
+                PhotoName = model.PhotoName,
+                CategoryId = model.CategoryId
             };
 
             _context.Products.Add(prod);
@@ -189,9 +192,39 @@ namespace WebServerCursova.Controllers
             int fNameIdType = _context.FilterNameGroups
                 .SingleOrDefault(v => v.FilterValueId == model.FilterIdType).FilterNameId;
 
+          
+            int valuePrice = 0;
+            if(model.Price < 50)
+            {
+                valuePrice = 1;
+            }
+            else if (model.Price >= 50 && model.Price < 100)
+            {
+                valuePrice = 2;
+            }
+            else if (model.Price >= 100 && model.Price < 300)
+            {
+                valuePrice = 3;
+            }
+            else if (model.Price >= 300 && model.Price < 700)
+            {
+                valuePrice = 4;
+            }
+            else if (model.Price >= 700)
+            {
+                valuePrice = 5;
+            }
 
-            Filter filter = new Filter { FilterNameId = fNameIdType, FilterValueId = fValueIdType, ProductId = prod.Id };
+            Filter filter = new Filter { FilterNameId = 1, FilterValueId = valuePrice, ProductId = prod.Id };
             var f = _context.Filters.SingleOrDefault(p => p == filter);
+            if (f == null)
+            {
+                _context.Filters.Add(filter);
+                _context.SaveChanges();
+            }
+
+            filter = new Filter { FilterNameId = fNameIdType, FilterValueId = fValueIdType, ProductId = prod.Id };
+            f = _context.Filters.SingleOrDefault(p => p == filter);
             if (f == null)
             {
                 _context.Filters.Add(filter);
@@ -263,6 +296,7 @@ namespace WebServerCursova.Controllers
                 product.Name = newModel.Name;
                 product.Price = newModel.Price;
                 product.DateCreate = DateTime.Now;
+                product.CategoryId = newModel.CategoryId;
 
                 _context.SaveChanges();
             }

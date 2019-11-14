@@ -21,6 +21,7 @@ namespace WebServerCursova.ViewModels
         public string PhotoBase64 { get; set; }  // вхідний параметр
         public string PhotoName { get; set; }    // вихідний параметр
         public int FilterIdType { get; set; }
+        public int CategoryId { get; set; }
     }
 
     public class ProductDeleteVM
@@ -40,5 +41,7 @@ namespace WebServerCursova.ViewModels
         public decimal Price { get; set; }
         public string PhotoBase64 { get; set; }  // вхідний параметр
         public string PhotoName { get; set; }    // вихідний параметр
+        public int FilterIdType { get; set; }
+        public int CategoryId { get; set; }
     }
 }
